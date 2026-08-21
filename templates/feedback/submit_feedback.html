@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Feedback & Stories - Lost & Found{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <!-- Heading -->
+  <div class="text-center mb-4" data-aos="fade-down">
+    <h2 class="fw-bold text-primary">We Value Your Feedback</h2>
+    <p class="text-muted">Let us know how we can improve your experience.</p>
+  </div>
+
+  <!-- Feedback Section -->
+  <div class="row g-4 mb-5">
+    <!-- Left Column: Feedback List -->
+    <div class="col-lg-8" data-aos="fade-right">
+      <h4 class="fw-bold text-secondary mb-3">What Others Are Saying</h4>
+
+      {% if feedbacks %}
+        {% for feedback in feedbacks %}
+          <div class="card mb-3 shadow-sm" data-aos="fade-up">
+            <div class="card-body">
+              <h5 class="card-title">
+                {% if feedback.name %}
+                  {{ feedback.name }}
+                {% elif feedback.user %}
+                  {{ feedback.user.get_full_name|default:feedback.user.username }}
+                {% else %}
+                  Anonymous
+                {% endif %}
+              </h5>
+              <p class="card-text">{{ feedback.message }}</p>
+              <p class="card-text">
+                <small class="text-muted">Submitted on {{ feedback.submitted_at|date:"M d, Y - H:i" }}</small>
+              </p>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted text-center">No feedback submitted yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Right Column: Feedback Form -->
+    <div class="col-lg-4" data-aos="zoom-in-left">
+      <div class="bg-white p-4 rounded shadow">
+        <h5 class="fw-bold text-secondary mb-3">Submit Feedback</h5>
+        <form method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-success mt-3 w-100">Submit Feedback</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Your Stories Section -->
+  <div class="row g-4" data-aos="fade-up">
+    <!-- Left Column: Stories List -->
+    <div class="col-lg-8">
+      <h4 class="fw-bold text-secondary mb-3">Community Stories</h4>
+
+      {% if stories %}
+        {% for story in stories %}
+          <div class="card mb-3 shadow-sm" data-aos="fade-up">
+            <div class="card-body">
+              <h5 class="card-title">
+                {{ story.title }}
+              </h5>
+              <p class="card-text">{{ story.content }}</p>
+              <p class="card-text">
+                <small class="text-muted">
+                  Shared by {{ story.user.get_full_name|default:story.user.username }}
+                  on {{ story.submitted_at|date:"M d, Y - H:i" }}
+
+                </small>
+              </p>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted text-center">No stories shared yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Right Column: Story Form -->
+    <div class="col-lg-4" data-aos="zoom-in-left">
+      <div class="bg-white p-4 rounded shadow">
+        <h5 class="fw-bold text-secondary mb-3">Share Your Story</h5>
+        <form method="POST" action="{% url 'feedback:share_story' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="story_title" class="form-label fw-semibold">Story Title</label>
+            <input type="text" id="story_title" name="title" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="story_content" class="form-label fw-semibold">Your Story</label>
+            <textarea id="story_content" name="content" class="form-control" rows="5" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary mt-3 w-100">Share Story</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

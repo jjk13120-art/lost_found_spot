@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4 my-4">
+  <h2 class="text-center fw-bold text-primary mb-4">📊 Admin Dashboard</h2>
+
+  <!-- Statistics Row -->
+  <div class="row g-4 mb-4">
+    <!-- Total Users -->
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+          <h5 class="card-title fw-bold text-secondary">Total Users</h5>
+          <h3 class="fw-bold text-primary mt-2">
+            👤 <span id="userCount">Loading...</span>
+          </h3>
+        </div>
+      </div>
+    </div>
+    <!-- Total Reports -->
+    <div class="col-md-6">
+      <div class="card shadow-sm border-0 h-100">
+        <div class="card-body d-flex flex-column align-items-center justify-content-center">
+          <h5 class="card-title fw-bold text-secondary">Total Reports</h5>
+          <h3 class="fw-bold text-warning mt-2">
+            📁 <span id="reportCount">Loading...</span>
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 1 -->
+  <div class="row g-4 mb-4">
+    <!-- Pie Chart -->
+    <div class="col-lg-6">
+      <div class="card shadow border-0 h-100">
+        <div class="card-header bg-success text-white text-center fw-semibold">
+          Report Status Overview (Pie)
+        </div>
+        <div class="card-body">
+          <canvas id="reportStatusChart" height="280"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line + Area Chart -->
+    <div class="col-lg-6">
+      <div class="card shadow border-0 h-100">
+        <div class="card-header bg-warning text-white text-center fw-semibold">
+          Reports Over Time (Line + Area)
+        </div>
+        <div class="card-body">
+          <canvas id="lineAreaChart" height="280"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Row 2 -->
+  <div class="row g-4">
+    <div class="col-12">
+      <div class="card shadow border-0">
+        <div class="card-header bg-danger text-white text-center fw-semibold">
+          Report Categories (Donut)
+        </div>
+        <div class="card-body">
+          <div style="height: 300px;">
+            <canvas id="donutChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@1.1.0"></script>
+
+<!-- Load Dashboard JS -->
+<script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

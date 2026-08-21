@@ -1,0 +1,104 @@
+  {% extends 'base.html' %}
+  {% block content %}
+
+  <a href="{% url 'reports:submit_report' %}" 
+    class="btn btn-dark btn-lg px-4 bg-white text-dark border-dark" 
+    onmouseover="this.classList.replace('bg-white', 'bg-dark'); this.classList.replace('text-dark', 'text-white');"
+    onmouseout="this.classList.replace('bg-dark', 'bg-white'); this.classList.replace('text-white', 'text-dark');"
+    data-aos="fade-left">
+    Report an Item
+  </a>
+
+
+
+  <h2 class="text-center mt-4 mb-4 text-primary-emphasis"><br>📋 Your Lost Reports</h2>
+
+  <!-- Search & Filter Form -->
+  <form method="get" class="row g-2 mb-4">
+    <div class="col-md-4">
+      <input name="q" type="text" class="form-control" placeholder="Search by category, title or description" value="{{ request.GET.q }}">
+    </div>
+
+    <div class="col-md-2">
+      <select name="status" class="form-select">
+        <option value="">All Status</option>
+        <option value="Lost" {% if request.GET.status == "Lost" %}selected{% endif %}>Lost</option>
+        <option value="Found" {% if request.GET.status == "Found" %}selected{% endif %}>Found</option>
+        <option value="Solved" {% if request.GET.status == "Solved" %}selected{% endif %}>Solved</option>
+      </select>
+    </div>
+
+    <div class="col-md-2">
+      <input name="from_date" type="date" class="form-control" value="{{ request.GET.from_date }}">
+    </div>
+
+    <div class="col-md-2">
+      <input name="to_date" type="date" class="form-control" value="{{ request.GET.to_date }}">
+    </div>
+
+    <div class="col-md-2">
+      <select name="sort" class="form-select">
+        <option value="latest" {% if request.GET.sort == "latest" %}selected{% endif %}>Latest</option>
+        <option value="oldest" {% if request.GET.sort == "oldest" %}selected{% endif %}>Oldest</option>
+      </select>
+    </div>
+
+    <div class="col-md-12 d-grid d-md-block">
+      <button type="submit" class="btn btn-primary">Apply Filters</button>
+      <a href="{% url 'reports:my_reports' %}" class="btn btn-outline-secondary ms-2">Reset</a>
+    </div>
+  </form>
+
+  <!-- Local Reports Section -->
+  {% if reports|length == 0 %}
+    <div class="alert alert-warning">No reports found matching your filters.</div>
+  {% endif %}
+
+  {% if reports %}
+  <div class="row row-cols-1 row-cols-md-2 g-4">
+    {% for report in reports %}
+      <div class="col">
+        <div class="card shadow-sm border-0 h-100" style="background: #fffaf5; border-radius: 0.75rem;">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start">
+              <h5 class="card-title fw-bold text-danger-emphasis mb-3">{{ report.title }}</h5>
+              {% if report.status == "Found" %}
+                <span class="badge bg-success text-white">{{ report.status }}</span>
+                {% elif report.status == "Solved" %}
+                  <span class="badge bg-warning text-dark">{{ report.status }}</span>
+              {% else %}
+                <span class="badge bg-danger text-white">{{ report.status }}</span>
+              {% endif %}
+            </div>
+
+            <p><i class="bi bi-tags-fill text-info me-1"></i> <strong>Category:</strong> {{ report.category }}</p>
+            <p><i class="bi bi-chat-left-text text-secondary me-1"></i> <strong>Description:</strong> {{ report.description }}</p>
+            <p>
+              <i class="bi bi-geo-alt-fill text-success me-1"></i> 
+              <strong>Location:</strong> 
+              <a href="{{ report.google_maps_url }}" target="_blank" class="link-primary text-decoration-none">{{ report.location }}</a>
+            </p>
+
+            {% if report.contact %}
+            <p><i class="bi bi-telephone-fill text-warning me-1"></i> <strong>Contact:</strong> {{ report.contact }}</p>
+            {% endif %}
+
+            {% if report.image %}
+              <img src="{{ report.image.url }}" alt="Report Image" class="img-fluid rounded border mt-3 shadow-sm" style="max-height: 200px; object-fit: cover;">
+            {% endif %}
+          </div>
+          <div class="card-footer bg-body-secondary text-end rounded-bottom">
+            <small class="text-muted">🕒 Reported on {{ report.date_reported }}</small>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="text-center text-muted mt-5">No reports submitted yet.</p>
+  {% endif %}
+
+  <!-- Reddit Scraped Posts Section -->
+  {% include "scraping/scraped_items.html" %}
+
+  {% endblock %}

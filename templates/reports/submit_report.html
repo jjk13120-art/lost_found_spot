@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+  body {
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    font-family: 'Segoe UI', sans-serif;
+    color: #f1f1f1;
+  }
+  h2 {
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  form {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #2b2b3d;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  }
+  label {
+    color: #ddd;
+    font-weight: 600;
+  }
+  input[type="text"],
+  input[type="email"],
+  input[type="file"],
+  input[type="password"],
+  textarea,
+  select {
+    width: 100%;
+    background-color: #3a3a4d !important;
+    color: #f1f1f1 !important;
+    border: none !important;
+    border-radius: 8px !important;
+    padding: 10px !important;
+    margin-bottom: 15px;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none !important;
+    box-shadow: 0 0 8px #ff9800 !important;
+    border: 1px solid #ff9800 !important;
+  }
+  button[type="submit"] {
+    background-color: #ff9800;
+    color: #fff;
+    border: none;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 10px 16px;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  button[type="submit"]:hover {
+    background-color: #ffad33;
+    transform: scale(1.05);
+  }
+</style>
+
+<h2>Submit Lost or Found Report</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit</button>
+</form>
+{% endblock %}

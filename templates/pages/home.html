@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Lost and Found Spot{% endblock %}
+
+{% block content %}
+
+<!-- Hero Section -->
+<section class="bg-light text-dark py-5 text-center" style="background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);">
+  <div class="container">
+    <h1 class="display-4 fw-bold mb-3" data-aos="fade-down" style="color: #333;">
+      Welcome to <span style="color:#9c27b0">Lost and Found Spot</span>
+    </h1>
+    <p class="lead mb-4" data-aos="fade-up">
+      Your trusted place to report lost items, find owners, and reconnect with your belongings.
+    </p>
+
+    {% if not user.is_authenticated %}
+      <a href="{% url 'accounts:signup' %}" class="btn btn-lg px-4 me-2"
+         style="background-color:#9c27b0; color:white;" data-aos="fade-right">Get Started</a>
+    {% endif %}
+    <a href="{% url 'reports:submit_report' %}" class="btn btn-outline-dark btn-lg px-4" data-aos="fade-left">
+      Report an Item
+    </a>
+  </div>
+</section>
+
+<!-- Stats + Chart Section -->
+<section class="py-4">
+  <div class="container" style="max-width: 850px;">
+    <div class="row g-3 align-items-stretch">
+
+      <!-- Total Users -->
+      <div class="col-md-3">
+        <div class="card border-0 h-100 shadow-lg" style="box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <div class="card-body text-center d-flex flex-column justify-content-center">
+            <h6 class="card-title fw-bold text-secondary mb-2">Users</h6>
+            <h4 class="fw-bold text-primary">
+              👤 <span id="userCount">0</span>
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Reports -->
+      <div class="col-md-3">
+        <div class="card border-0 h-100 shadow-lg" style="box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <div class="card-body text-center d-flex flex-column justify-content-center">
+            <h6 class="card-title fw-bold text-secondary mb-2">Reports</h6>
+            <h4 class="fw-bold text-warning">
+              📁 <span id="reportCount">0</span>
+            </h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3D Pie Chart -->
+      <div class="col-md-6">
+        <div class="card border-0 h-100 shadow-lg" style="box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+          <div class="card-header bg-success text-white text-center fw-semibold py-2">
+            Status Overview
+          </div>
+          <div class="card-body p-2">
+            <div id="home3dChart" style="width: 100%; height: 200px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5" id="features">
+  <div class="container">
+    <h2 class="text-center fw-bold mb-5" data-aos="fade-up" style="color: #5e35b1;">Why Use Lost and Found Spot?</h2>
+    <div class="row g-4">
+      <div class="col-md-4" data-aos="zoom-in">
+        <div class="card shadow-lg h-100 border-0">
+          <div class="card-body">
+            <h5 class="card-title text-primary fw-semibold">📝 Easy Reporting</h5>
+            <p class="card-text">Quickly report a lost or found item in seconds using our clean, intuitive interface.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="100">
+        <div class="card shadow-lg h-100 border-0">
+          <div class="card-body">
+            <h5 class="card-title text-success fw-semibold">🤖 Smart Matching</h5>
+            <p class="card-text">Our system uses AI-powered tools to suggest potential matches for lost and found items.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4" data-aos="zoom-in" data-aos-delay="200">
+        <div class="card shadow-lg h-100 border-0">
+          <div class="card-body">
+            <h5 class="card-title text-warning fw-semibold">🤝 Community Driven</h5>
+            <p class="card-text">Get help from a helpful community to increase your chances of reuniting with your items.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 text-white" style="background: linear-gradient(120deg, #8e24aa, #6a1b9a);">
+  <div class="container text-center" data-aos="fade-up">
+    <h2 class="fw-bold mb-3">Join our community today!</h2>
+    <p class="mb-4">Start reporting or searching lost items now and become part of our growing network.</p>
+    {% if not user.is_authenticated %}
+      <a href="{% url 'accounts:signup' %}" class="btn btn-light btn-lg px-4">Sign Up</a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- amCharts Scripts -->
+<script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/percent.js"></script>
+<script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  // Fetch user count
+  fetch("/api/user-count/")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("userCount").innerText = data.user_count + 120;
+    });
+
+  // Fetch reports
+  fetch("/api/reports/")
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("reportCount").innerText = data.report_count;
+
+      const statusLabels = data.status_data.map(item => item.status);
+      const statusCounts = data.status_data.map(item => item.count);
+
+      am5.ready(function () {
+        var root = am5.Root.new("home3dChart");
+        root.setThemes([am5themes_Animated.new(root)]);
+
+        // Enable 3D effect
+        var chart = root.container.children.push(
+          am5percent.PieChart.new(root, {
+            layout: root.verticalLayout,
+            innerRadius: 0,
+            depth: 20,
+            angle: 15
+          })
+        );
+
+        var series = chart.series.push(
+          am5percent.PieSeries.new(root, {
+            valueField: "value",
+            categoryField: "category"
+          })
+        );
+
+        // Let amCharts handle colors automatically for variety
+        const chartData = statusLabels.map((label, index) => ({
+          category: label,
+          value: statusCounts[index]
+        }));
+
+        series.data.setAll(chartData);
+
+        // Animate
+        series.appear(1000, 100);
+      });
+    });
+});
+</script>
+
+
+{% endblock %}

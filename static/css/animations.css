@@ -1,0 +1,15 @@
+#transition:target {
+  display: block !important;
+  animation: slideUp 0.6s forwards;
+}
+
+@keyframes slideUp {
+  0% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
