@@ -35,13 +35,21 @@ class CustomEmailBackend(EmailBackend):
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load .env file if it exists
+try:
+    from dotenv import load_dotenv
+    load_dotenv(BASE_DIR / '.env')
+except ImportError:
+    pass
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-ounrkuwlf$%gxupakrpr*-mgh-%4-4xcor-v-3wlhdxwjeaz1v'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-ounrkuwlf$%gxupakrpr*-mgh-%4-4xcor-v-3wlhdxwjeaz1v')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+# Allow hosts defined in environment variable or fall back to localhost/any
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '127.0.0.1,localhost,*').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -62,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # serve static files in production
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -135,5 +144,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = 'jjk13120@gmail.com'
-EMAIL_HOST_PASSWORD = 'kjilknwobtcfltqe'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'jjk13120@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'kjilknwobtcfltqe')
+
+# WhiteNoise storage settings
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
