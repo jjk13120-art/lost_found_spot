@@ -9,8 +9,10 @@ from .forms import SignUpForm, LoginForm, UserUpdateForm, ProfileUpdateForm
 from .models import Profile
 
 
-def send_html_email(subject, text_content, html_content, to_email):
-    """Helper to send email with HTML and text fallback."""
+import threading
+
+def _send_html_email_sync(subject, text_content, html_content, to_email):
+    """Helper to send email with HTML and text fallback synchronously."""
     from_email = settings.EMAIL_HOST_USER
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to_email])
     msg.attach_alternative(html_content, "text/html")
@@ -18,6 +20,14 @@ def send_html_email(subject, text_content, html_content, to_email):
         msg.send()
     except Exception as e:
         print("Email sending failed:", e)
+
+def send_html_email(subject, text_content, html_content, to_email):
+    """Helper to send email asynchronously in a background thread to prevent blocking the HTTP request."""
+    thread = threading.Thread(
+        target=_send_html_email_sync,
+        args=(subject, text_content, html_content, to_email)
+    )
+    thread.start()
 
 
 def set_user_cookies(response, user):

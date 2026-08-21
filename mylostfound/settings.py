@@ -155,6 +155,7 @@ EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'your-email@gmail.com')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'your-app-password')
+EMAIL_TIMEOUT = 5  # <-- Limit timeout to 5 seconds to prevent Gunicorn workers from hanging
 
 # WhiteNoise storage settings
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
